@@ -4,7 +4,7 @@ Veritas Ingestion Engine
 2. 動態調度所有適配器，執行沙盒隔離採集。
 3. 全域語意級去重合併：created 取最早、modified 取最晚、object_refs 取聯集。
 4. 封裝當日全量存證至 archive/ 冷存檔。
-5. 滾動過濾：熱端點 bundle-latest.json 永遠保留近 30 天資料。
+5. 滾動過濾：熱端點 bundle-latest.json 滾動保留過去 2 年 (730 天) 資料。
 """
 import sys
 from pathlib import Path
@@ -24,10 +24,11 @@ from adapters.base import deterministic_uuid
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 
 HKMA_AUTHORITY_ID = f"identity--{deterministic_uuid('HKMA_OFFICIAL')}"
+ROLLING_DAYS = 730  # 過去 2 年 (730 天)
 
 def deduplicate_stix_objects(objects: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """
-    按 STIX ID 進行語意級去重合併，解決多次通報產生的時間戳與關聯引用衝突：
+    按 STIX ID 進行語意級去重合併：
     - created 取最早 (earliest)
     - modified 取最晚 (latest)
     - object_refs 合併為排序唯一列表 (union)
@@ -72,7 +73,7 @@ def run():
     raw_objects = []
     now = datetime.now(timezone.utc)
     today_str = now.strftime("%Y%m%d")
-    cutoff_date = now - timedelta(days=30)
+    cutoff_date = now - timedelta(days=ROLLING_DAYS)
 
     for adapter_cls in adapters:
         adapter = adapter_cls()
@@ -103,20 +104,24 @@ def run():
         json.dump(daily_snapshot, f, ensure_ascii=False)
     logging.info("冷存檔快照已封裝: %s", archive_file)
 
-    # --- 2. 熱端點 (30 天滾動，O(1) 集合查找) ---
-    recent_reports = []
-    needed_ids = set()
+    # --- 2. 熱端點 (過去 2 年滾動，若不足則回退保留最新 20 筆避免冷啟動為 0) ---
+    all_reports = [obj for obj in all_objects if obj.get("type") == "report"]
+    all_reports.sort(key=lambda x: x.get("published", ""), reverse=True)
 
-    for obj in all_objects:
-        if obj.get("type") == "report":
-            try:
-                pub = datetime.fromisoformat(obj["published"].replace("Z", "+00:00"))
-                if pub >= cutoff_date:
-                    recent_reports.append(obj)
-                    for ref_id in obj.get("object_refs", []):
-                        needed_ids.add(ref_id)
-            except Exception:
-                continue
+    recent_reports = [
+        r for r in all_reports
+        if datetime.fromisoformat(r["published"].replace("Z", "+00:00")) >= cutoff_date
+    ]
+
+    # 回退保護機制：若過去 2 年內無資料，取全量歷史最新 20 筆作為 Baseline
+    if len(recent_reports) == 0 and len(all_reports) > 0:
+        logging.info("指定窗口內無新公報，回退載入歷史最新 %d 筆", min(20, len(all_reports)))
+        recent_reports = all_reports[:20]
+
+    needed_ids = set()
+    for r in recent_reports:
+        for ref_id in r.get("object_refs", []):
+            needed_ids.add(ref_id)
 
     recent_report_ids = {r["id"] for r in recent_reports}
 
@@ -129,7 +134,7 @@ def run():
 
     hot_bundle = {
         "type": "bundle",
-        "id": f"bundle--{deterministic_uuid('HOT_30D_' + today_str)}",
+        "id": f"bundle--{deterministic_uuid('HOT_2Y_' + today_str)}",
         "objects": hot_objects
     }
 
@@ -138,7 +143,7 @@ def run():
     with open(latest_file, "w", encoding="utf-8") as f:
         json.dump(hot_bundle, f, ensure_ascii=False)
 
-    logging.info("熱資料端點更新完成: %s (保留 30 天內共 %d 筆物件)", latest_file, len(hot_objects))
+    logging.info("熱資料端點更新完成: %s (保留 2 年內共 %d 筆物件，含 %d 筆 Report)", latest_file, len(hot_objects), len(recent_reports))
 
 if __name__ == "__main__":
     run()
