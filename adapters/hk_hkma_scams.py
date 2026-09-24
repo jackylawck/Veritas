@@ -3,7 +3,9 @@
 資料授權：香港特區政府《開放數據許可協議》 (data.gov.hk)
 """
 import json
+import logging
 import re
+import time
 import urllib.parse
 import urllib.request
 from datetime import datetime, timezone
@@ -25,7 +27,7 @@ class HKMAScamAdapter(BaseSourceAdapter):
         if not field_value:
             return domains
 
-        candidates = re.split(r'[\s,;\n\r]+', field_value.strip())
+        candidates = re.split(r'[\s,;\n\r]+', str(field_value).strip())
         for raw_url in candidates:
             if not raw_url:
                 continue
@@ -41,15 +43,42 @@ class HKMAScamAdapter(BaseSourceAdapter):
 
     def fetch_and_parse(self) -> List[Dict[str, Any]]:
         headers = {
-            "User-Agent": "Veritas-OSINT-Mirror/1.0 (+https://github.com/jackylawck/veritas)"
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Accept": "application/json"
         }
         req = urllib.request.Request(HKMA_API_ENDPOINT, headers=headers)
-        with urllib.request.urlopen(req, timeout=15) as response:
-            if response.status != 200:
-                raise RuntimeError(f"HTTP {response.status} from HKMA API")
-            raw_payload = json.loads(response.read().decode("utf-8"))
 
-        records = raw_payload.get("result", {}).get("records", [])
+        # 增加 3 次指數退避重試，單次 timeout 拉長至 45 秒防止跨國節點逾時
+        max_retries = 3
+        raw_payload = None
+        for attempt in range(1, max_retries + 1):
+            try:
+                logging.info("正在請求 HKMA API (嘗試 %d/%d)...", attempt, max_retries)
+                with urllib.request.urlopen(req, timeout=45) as response:
+                    if response.status == 200:
+                        raw_payload = json.loads(response.read().decode("utf-8"))
+                        break
+                    raise RuntimeError(f"HTTP {response.status} from HKMA API")
+            except Exception as e:
+                logging.warning("HKMA API 請求嘗試 %d 失敗: %s", attempt, str(e))
+                if attempt == max_retries:
+                    raise e
+                time.sleep(attempt * 2)
+
+        if not raw_payload:
+            return []
+
+        # 兼容不同層級的 records 資料結構
+        result_block = raw_payload.get("result", {})
+        if isinstance(result_block, dict):
+            records = result_block.get("records", [])
+        elif isinstance(raw_payload.get("records"), list):
+            records = raw_payload.get("records", [])
+        else:
+            records = []
+
+        logging.info("HKMA 成功取得原始記錄數: %d", len(records))
+
         stix_objects = []
 
         # 1. 官方來源 Identity SDO（時間戳永久錨定於 PROJECT_EPOCH，確保冪等性）
@@ -67,13 +96,12 @@ class HKMAScamAdapter(BaseSourceAdapter):
         })
 
         for item in records:
-            issue_date = item.get("issue_date")
-            alleged_name = (item.get("alleged_name") or "Unknown Entity").strip()
-            pr_url = (item.get("pr_url") or "").strip()
-            fraud_field = item.get("fraud_website_address")
+            issue_date = item.get("issue_date") or item.get("issueDate") or ""
+            alleged_name = str(item.get("alleged_name") or item.get("allegedName") or "Unknown Entity").strip()
+            pr_url = str(item.get("pr_url") or item.get("prUrl") or "").strip()
+            fraud_field = item.get("fraud_website_address") or item.get("fraudWebsiteAddress") or item.get("website") or ""
 
-            # 安全解析公報時間
-            safe_date = (issue_date or "").strip()
+            safe_date = str(issue_date).strip()
             if safe_date:
                 try:
                     pub_time = datetime.strptime(safe_date, "%Y-%m-%d").replace(tzinfo=timezone.utc).isoformat().replace("+00:00", "Z")
@@ -84,7 +112,7 @@ class HKMAScamAdapter(BaseSourceAdapter):
                 pub_time = PROJECT_EPOCH
                 safe_date = "unknown-date"
 
-            # 2. 被冒用實體 Identity SDO (sectors 使用 STIX 標準開放詞彙 financial-services)
+            # 2. 被冒用實體 Identity SDO
             victim_id = f"identity--{deterministic_uuid(f'BANK_{alleged_name}')}"
             stix_objects.append({
                 "type": "identity",
