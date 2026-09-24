@@ -1,14 +1,22 @@
 """
 Veritas Ingestion Engine
-1. 動態調度所有適配器，執行沙盒隔離採集。
-2. 全域語意級去重合併：created 取最早、modified 取最晚、object_refs 取聯集。
-3. 封裝當日全量存證至 archive/ 冷存檔。
-4. 滾動過濾：熱端點 bundle-latest.json 永遠保留近 30 天資料。
+1. 自動修復專案根目錄搜尋路徑，防範 ModuleNotFoundError: No module named 'adapters'
+2. 動態調度所有適配器，執行沙盒隔離採集。
+3. 全域語意級去重合併：created 取最早、modified 取最晚、object_refs 取聯集。
+4. 封裝當日全量存證至 archive/ 冷存檔。
+5. 滾動過濾：熱端點 bundle-latest.json 永遠保留近 30 天資料。
 """
+import sys
+from pathlib import Path
+
+# 將專案根目錄加入 Python 搜尋路徑
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
 import json
 import logging
 from datetime import datetime, timedelta, timezone
-from pathlib import Path
 from typing import Any, Dict, List
 from adapters import discover_adapters
 from adapters.base import deterministic_uuid
