@@ -154,7 +154,7 @@ cat public/api/bundle-latest.json | head -n 30
 
 ```bash
 git add README.md
-git commit -m "docs: finalize enterprise bilingual README with responsive mermaid flow"
+git commit -m "docs: finalize enterprise bilingual README"
 git push origin main
 
 ```
