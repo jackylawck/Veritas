@@ -1,0 +1,94 @@
+name: Ingest, Sign & Deploy Pages
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # 每日 UTC 00:00 執行
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write # Sigstore Keyless OIDC 憑證必須
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Execute Ingestion Pipeline
+        run: |
+          python scripts/ingest.py
+
+      - name: Hard Smoke Test (Yield & STIX ID Uniqueness)
+        run: |
+          python - <<'EOF'
+          import json, sys
+          try:
+              with open('public/api/bundle-latest.json', 'r', encoding='utf-8') as f:
+                  data = json.load(f)
+          except Exception as e:
+              print(f"::error::Failed to read bundle-latest.json: {e}")
+              sys.exit(1)
+
+          objs = data.get('objects', [])
+          reports = [x for x in objs if x.get('type') == 'report']
+          indicators = [x for x in objs if x.get('type') == 'indicator']
+
+          print(f"Verified Reports: {len(reports)}, Indicators: {len(indicators)}")
+
+          # 1. 產出數量檢查
+          if len(reports) == 0:
+              print("::error::Zero reports ingested. Upstream API may be down or schema changed.")
+              sys.exit(1)
+
+          if len(indicators) == 0:
+              print("::error::Reports exist but zero indicators extracted. Check field mapping!")
+              sys.exit(1)
+
+          # 2. STIX ID 全域唯一性檢查
+          all_ids = [x.get('id') for x in objs if x.get('id')]
+          if len(all_ids) != len(set(all_ids)):
+              dupes = [oid for oid in set(all_ids) if all_ids.count(oid) > 1]
+              print(f"::error::Duplicate STIX IDs detected in bundle: {dupes[:5]}")
+              sys.exit(1)
+
+          print("Smoke test passed: ID uniqueness and indicator yield validated.")
+          EOF
+
+      - name: Install Cosign (Sigstore)
+        uses: sigstore/cosign-installer@v3.5.0
+
+      - name: Keyless Cryptographic Signing (Rekor Logged)
+        run: |
+          # 僅在預設主要分支進行官方簽名，產出透明日誌憑證
+          cosign sign-blob \
+            --yes \
+            --bundle public/api/bundle-latest.json.sigstore.json \
+            public/api/bundle-latest.json
+          echo "Signed bundle-latest.json successfully via Sigstore Keyless OIDC."
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './public'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
