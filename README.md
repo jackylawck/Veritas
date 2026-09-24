@@ -52,41 +52,20 @@ Veritas integrates 20+ statutory authorities and global detection feeds across m
 ## ⚙️ Architecture & Engineering Specs / 系統架構與工程規格
 
 
-```
+```mermaid
+flowchart TD
+    A["🏛️ Sovereign Gazettes & Open Feeds<br/>(HKMA, SFC, CSTCB, MAS, CFTC, FBI, FCA, BaFin, ESMA, OFAC, ...)"] --> B["🔌 Dynamic Plugin Discovery<br/>adapters/*.py"]
+    B --> C["⚙️ Ingestion & Parsing Engine<br/>scripts/ingest.py<br/>• Pure Python (Zero Dependencies)<br/>• Deterministic RFC 4122 UUIDv5<br/>• Zero-PII Regex Cleansing<br/>• STIX 2.1 Deduplication"]
+    
+    C --> D["🔥 Hot Rolling Data (Since 2024 / 730d)<br/>public/api/bundle-latest.json"]
+    C --> E["❄️ Immutable Cold Archive<br/>public/api/archive/YYYY/MM/*.json"]
+    
+    D --> F["🚀 CI/CD Automated Pipeline<br/>• Sigstore Cosign Signing<br/>• GitHub Pages Live Deployment"]
+    E --> F
 
-```
-             [ Sovereign Gazettes & Open Feeds ]
- (HKMA, SFC, CSTCB, MAS, CFTC, FBI, FCA, BaFin, ESMA, OFAC, ...)
-                              │
-                              ▼
-                ┌───────────────────────────┐
-                │     adapters/*.py         │ ◄── Dynamic Plugin Discovery
-                │   (Statutory Adapters)    │
-                └─────────────┬─────────────┘
-                              │
-                              ▼
-                ┌───────────────────────────┐
-                │      scripts/ingest.py    │ ◄── Pure Python (Zero Dependencies)
-                │  - Deterministic UUIDv5   │
-                │  - Strict Zero-PII Regex  │
-                │  - STIX 2.1 Deduplication │
-                └─────────────┬─────────────┘
-                              │
-               ┌──────────────┴──────────────┐
-               ▼                             ▼
-   ┌───────────────────────┐     ┌───────────────────────┐
-   │   Hot Rolling Data    │     │ Immutable Cold Store  │
-   │ (Since 2024 / 730d)   │     │ (Monthly Snapshots)   │
-   │  bundle-latest.json   │     │  archive/YYYY/MM/*.   │
-   └───────────┬───────────┘     └───────────┬───────────┘
-               │                             │
-               └──────────────┬──────────────┘
-                              ▼
-               ┌─────────────────────────────┐
-               │  GitHub Actions CI/CD       │
-               │  - Sigstore Cosign Signing  │
-               │  - GitHub Pages Deployment  │
-               └─────────────────────────────┘
+    classDef default fill:#161b22,stroke:#30363d,stroke-width:1px,color:#c9d1d9;
+    classDef highlight fill:#1f2937,stroke:#58a6ff,stroke-width:1.5px,color:#f0f6fc;
+    class C,F highlight;
 
 ```
 
