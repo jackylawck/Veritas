@@ -2,7 +2,7 @@
 ### Sovereign Scam & Impersonation Bulletin Mirror (STIX 2.1)
 ### 法定機構防偽與跨國詐騙公報結構化威脅情報鏡像
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![STIX Version](https://img.shields.io/badge/STIX-2.1-orange.svg)](https://oasis-open.github.io/cti-documentation/)
 [![Signed by Sigstore](https://img.shields.io/badge/Signed_by-Sigstore_Cosign-green.svg)](https://sigstore.dev/)
 [![Compliance](https://img.shields.io/badge/Compliance-Zero--PII%20%7C%20Non--AI-blueviolet.svg)](LEGAL_COMPLIANCE.md)
@@ -51,7 +51,6 @@ Veritas integrates 20+ statutory authorities and global detection feeds across m
 
 ## ⚙️ Architecture & Engineering Specs / 系統架構與工程規格
 
-
 ```mermaid
 flowchart TD
     A["🏛️ Sovereign Gazettes & Open Feeds<br/>(HKMA, SFC, CSTCB, MAS, CFTC, FBI, FCA, BaFin, ESMA, OFAC, ...)"] --> B["🔌 Dynamic Plugin Discovery<br/>adapters/*.py"]
@@ -69,23 +68,23 @@ flowchart TD
 
 ```
 
-```
-
 1. **Zero External Dependencies / 零外部函式庫依賴**:
-   Engineered using vanilla Python standard libraries (`urllib`, `re`, `json`, `hashlib`, `uuid`). Completely immune to third-party PyPI supply chain poisonings.
+Engineered using vanilla Python standard libraries (`urllib`, `re`, `json`, `hashlib`, `uuid`). Completely immune to third-party PyPI supply chain poisonings.
 2. **Deterministic Idempotency / 確定性命名空間冪等性**:
-   Identities, Indicators, and Reports utilize RFC 4122 UUIDv5 scoped under DNS namespace `veritas.threat-intel.internal`. Repeated runs generate identical STIX IDs with zero drift.
+Identities, Indicators, and Reports utilize RFC 4122 UUIDv5 scoped under DNS namespace `veritas.threat-intel.internal`. Repeated runs generate identical STIX IDs with zero drift.
 3. **Dual-Tier Storage Model / 冷熱雙軌儲存架構**:
-   * **Hot Feed (`bundle-latest.json`)**: Rolling 730-day window ("Since 2024") maintaining ultra-low footprint for real-time edge security integration.
-   * **Cold Archive (`archive/YYYY/MM/*.json`)**: Immutable snapshots preserving historical evidentiary provenance.
+* **Hot Feed (`bundle-latest.json`)**: Rolling 730-day window ("Since 2024") maintaining ultra-low footprint for real-time edge security integration.
+* **Cold Archive (`archive/YYYY/MM/*.json`)**: Immutable snapshots preserving historical evidentiary provenance.
+
+
 4. **Cryptographic Provenance / 密碼學簽名溯源**:
-   Automated keyless cryptographic signing via **Sigstore Cosign** within GitHub Actions, establishing non-repudiation.
+Automated keyless cryptographic signing via **Sigstore Cosign** within GitHub Actions, establishing non-repudiation.
 
 ---
 
 ## ⚖️ Regulatory Compliance & Privacy Governance / 法律與合規聲明
 
-Veritas is purposefully designed for strict global regulatory compliance. For complete legal justifications and audit defense, refer to [**LEGAL_COMPLIANCE.md**](LEGAL_COMPLIANCE.md):
+Veritas is purposefully designed for strict global regulatory compliance. For complete legal justifications and audit defense, refer to **[LEGAL_COMPLIANCE.md](https://www.google.com/search?q=LEGAL_COMPLIANCE.md&utm_source=gemini)**:
 
 * **EU AI Act (Regulation (EU) 2024/1689)**: **Out of Scope (Article 3(1))**. Veritas uses purely deterministic Regex and heuristic string-matching rules. It contains zero machine learning, zero statistical models, and zero generative capabilities.
 * **ISO/IEC 42001:2023 (AIMS)**: Formally declared as **Non-Applicable** due to the absence of AI training and deployment.
@@ -154,8 +153,8 @@ cat public/api/bundle-latest.json | head -n 30
 ### 4. Deploy Updates / 提交變更
 
 ```bash
-git add adapters/ public/ README.md
-git commit -m "feat: synchronize sovereign threat feeds"
+git add README.md
+git commit -m "docs: finalize enterprise bilingual README with responsive mermaid flow"
 git push origin main
 
 ```
