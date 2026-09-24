@@ -90,19 +90,27 @@ def run():
     all_objects = deduplicate_stix_objects(raw_objects)
     logging.info("全域去重合併完成: %d -> %d 個唯一 STIX 物件", before_count, len(all_objects))
 
-    # --- 1. 冷存檔 (全量歷史快照) ---
-    archive_dir = Path(f"public/api/archive/{now.strftime('%Y/%m')}")
-    archive_dir.mkdir(parents=True, exist_ok=True)
-    archive_file = archive_dir / f"bundle-{today_str}.json"
+    latest_file = Path("public/api/bundle-latest.json")
 
-    daily_snapshot = {
-        "type": "bundle",
-        "id": f"bundle--{deterministic_uuid('SNAPSHOT_' + today_str)}",
-        "objects": all_objects
-    }
-    with open(archive_file, "w", encoding="utf-8") as f:
-        json.dump(daily_snapshot, f, ensure_ascii=False)
-    logging.info("冷存檔快照已封裝: %s", archive_file)
+    # 防禦降級：若本次採集全部失敗且解析物件為 0，但本地已存在可用快照，則保留現有資料
+    if len(all_objects) == 0 and latest_file.exists():
+        logging.warning("本次採集獲取 0 個物件，自動保留現有 bundle-latest.json 作為降級快照")
+        return
+
+    # --- 1. 冷存檔 (全量歷史快照) ---
+    if len(all_objects) > 0:
+        archive_dir = Path(f"public/api/archive/{now.strftime('%Y/%m')}")
+        archive_dir.mkdir(parents=True, exist_ok=True)
+        archive_file = archive_dir / f"bundle-{today_str}.json"
+
+        daily_snapshot = {
+            "type": "bundle",
+            "id": f"bundle--{deterministic_uuid('SNAPSHOT_' + today_str)}",
+            "objects": all_objects
+        }
+        with open(archive_file, "w", encoding="utf-8") as f:
+            json.dump(daily_snapshot, f, ensure_ascii=False)
+        logging.info("冷存檔快照已封裝: %s", archive_file)
 
     # --- 2. 熱端點 (過去 2 年滾動，若不足則回退保留最新 20 筆避免冷啟動為 0) ---
     all_reports = [obj for obj in all_objects if obj.get("type") == "report"]
@@ -138,7 +146,6 @@ def run():
         "objects": hot_objects
     }
 
-    latest_file = Path("public/api/bundle-latest.json")
     latest_file.parent.mkdir(parents=True, exist_ok=True)
     with open(latest_file, "w", encoding="utf-8") as f:
         json.dump(hot_bundle, f, ensure_ascii=False)
