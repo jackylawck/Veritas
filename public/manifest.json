@@ -1,0 +1,23 @@
+{
+  "name": "Veritas 揭偽 | 主權防偽威脅情報",
+  "short_name": "Veritas 揭偽",
+  "description": "法定機構防詐公報結構化 STIX 2.1 鏡像與即時防偽情報",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0d1117",
+  "theme_color": "#0d1117",
+  "icons": [
+    {
+      "src": "Veritas192icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "Veritas512icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
