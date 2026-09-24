@@ -3,68 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-
-  <!-- 🔍 基礎 SEO 核心標籤 -->
   <title>🛡️ Veritas 揭偽 | 主權級防偽與威脅情報帳本 (Sovereign Fraud Intelligence)</title>
-  <meta name="description" content="Veritas (揭偽) 是一個企業級、開源、雙語的跨國主權防偽威脅情報鏡像帳本。即時匯聚香港金管局 (HKMA)、香港證監會 (SFC)、新加坡金管局 (MAS)、美英台等全球法定機構公報，提供去個資化、可機讀的標準 STIX 2.1 威脅情報。">
-  <meta name="keywords" content="Veritas, 揭偽, 防詐騙, 威脅情報, CTI, STIX 2.1, 釣魚網站, 投資騙局, 香港金管局, SFC, MAS, 網絡安全, Open Source Intelligence, OSINT">
-  <meta name="author" content="Veritas Project">
-  <meta name="robots" content="index, follow">
-  <link rel="canonical" href="https://jackylawck.github.io/Veritas/">
-
-  <!-- 🔎 Google Search Console 驗證 -->
+  
+  <meta name="description" content="Veritas (揭偽) 是一個企業級、開源、雙語的跨國主權防偽威脅情報鏡像帳本。即時匯聚香港金管局 (HKMA)、香港證監會 (SFC)、新加坡金管局 (MAS) 等全球法定機構公報。">
   <meta name="google-site-verification" content="JZ5UohX-CcP_fQV0_DI9VadkKY4ZoTTkUifL88-fIcY" />
-
-  <!-- 🌐 Open Graph / Facebook / LinkedIn 社交卡片 -->
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://jackylawck.github.io/Veritas/">
-  <meta property="og:title" content="🛡️ Veritas 揭偽 | 全球法定機構防詐公報 STIX 2.1 鏡像">
-  <meta property="og:description" content="匯聚全球司法與金融監管機構最新高危指標。零個資、高置信度、開源可機讀的防偽情報熱端點。">
-  <meta property="og:image" content="https://jackylawck.github.io/Veritas/Veritas512icon.png">
-  <meta property="og:image:width" content="512">
-  <meta property="og:image:height" content="512">
-  <meta property="og:image:alt" content="Veritas 揭偽 標誌">
-  <meta property="og:locale" content="zh_HK">
-  <meta property="og:site_name" content="Veritas 揭偽">
-
-  <!-- 🐦 Twitter Cards -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="🛡️ Veritas 揭偽 | Sovereign Anti-Fraud Intelligence">
-  <meta name="twitter:description" content="Machine-readable STIX 2.1 threat feed mirroring global sovereign fraud alerts. Zero-PII, statutory provenance.">
-  <meta name="twitter:image" content="https://jackylawck.github.io/Veritas/Veritas512icon.png">
-
-  <!-- 📱 PWA 與手機主畫面圖標 (Add to Home Screen) -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Veritas 揭偽">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="theme-color" content="#0d1117">
-  <meta name="application-name" content="Veritas 揭偽">
-  <link rel="manifest" href="manifest.json">
-
-  <!-- 🍏 iOS 專屬主畫面圖標 -->
-  <link rel="apple-touch-icon" sizes="192x192" href="Veritas192icon.png">
-  <link rel="apple-touch-icon" sizes="512x512" href="Veritas512icon.png">
-
-  <!-- 💻 瀏覽器 Favicon (優先使用 192 圖標，備用 SVG) -->
+  
   <link rel="icon" type="image/png" sizes="192x192" href="Veritas192icon.png">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
-
-  <!-- 🛡️ 企業級極致安全策略：CSP 與硬性權限隔離 (零外鏈注入、禁跨域外帶) -->
-  <meta http-equiv="Content-Security-Policy" content="
-    default-src 'self';
-    script-src 'self' 'unsafe-inline';
-    style-src 'self' 'unsafe-inline';
-    img-src 'self' data: https://jackylawck.github.io;
-    font-src 'self' data:;
-    connect-src 'self';
-    object-src 'none';
-    base-uri 'self';
-    form-action 'none';
-    frame-ancestors 'none';
-  ">
-  <meta http-equiv="Permissions-Policy" content="accelerometer=(), gyroscope=(), microphone=(), camera=(), geolocation=(), payment=(), usb=()">
-  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <link rel="manifest" href="manifest.json">
 
   <style>
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0d1117; color: #c9d1d9; padding: 2rem; max-width: 860px; margin: 0 auto; line-height: 1.5; }
@@ -72,11 +18,17 @@
     h1 { color: #f0f6fc; font-size: 1.4rem; margin: 0; }
     .lang-btn { background: #21262d; border: 1px solid #30363d; color: #58a6ff; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; }
     .lang-btn:hover { background: #30363d; }
-    .sub { color: #8b949e; font-size: 0.85rem; margin-bottom: 1.5rem; }
-    .box { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 0.75rem 1rem; margin-bottom: 1.5rem; font-size: 0.9rem; }
+    .sub { color: #8b949e; font-size: 0.85rem; margin-bottom: 1.2rem; }
+    .box { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 0.75rem 1rem; margin-bottom: 1rem; font-size: 0.9rem; }
+    
+    /* 搜尋框專屬樣式 */
+    .search-box { width: 100%; box-sizing: border-box; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; padding: 0.75rem 1rem; color: #f0f6fc; font-size: 0.95rem; margin-bottom: 1.2rem; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+    .search-box:focus { border-color: #58a6ff; box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.2); }
+    .search-box::placeholder { color: #6e7681; }
+
     .card { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 1rem; margin-bottom: 0.75rem; }
     .card h2 { font-size: 1rem; margin: 0 0 0.5rem 0; color: #f0f6fc; }
-    .ioc { font-family: ui-monospace, monospace; background: #000; padding: 2px 6px; border-radius: 4px; color: #ff7b72; font-size: 0.85rem; }
+    .ioc { font-family: ui-monospace, monospace; background: #000; padding: 2px 6px; border-radius: 4px; color: #ff7b72; font-size: 0.85rem; word-break: break-all; }
     .badge { font-size: 0.75rem; border: 1px solid #30363d; padding: 2px 6px; border-radius: 12px; color: #8b949e; margin-left: 0.5rem; }
     a { color: #58a6ff; text-decoration: none; }
     a:hover { text-decoration: underline; }
@@ -98,11 +50,25 @@
     <span style="color: #8b949e; margin-left: 0.75rem;" id="stat">連線中...</span>
   </div>
 
+  <!-- 即時搜尋輸入框 -->
+  <input type="text" id="search-input" class="search-box" placeholder="🔍 搜尋可疑網域、銀行或機構名稱..." oninput="handleSearch()">
+
   <div id="list">載入中...</div>
+
+  <footer style="margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid #30363d; font-size: 0.8rem; color: #8b949e; text-align: center;">
+    <div>Veritas Project · Zero-PII Sovereign Threat Intelligence Mirror</div>
+    <div style="margin-top: 0.5rem;">
+      <a href="https://github.com/jackylawck/Veritas/blob/main/LEGAL_COMPLIANCE.md" target="_blank" rel="noopener noreferrer" style="color: #58a6ff; margin: 0 0.5rem;">⚖️ Legal & AI Compliance</a>
+      <span>·</span>
+      <a href="https://github.com/jackylawck/Veritas" target="_blank" rel="noopener noreferrer" style="color: #58a6ff; margin: 0 0.5rem;">GitHub Source</a>
+    </div>
+  </footer>
 
   <script>
     let currentLang = localStorage.getItem('veritas_lang') || 'zh';
     let cachedBundle = null;
+    let allReports = [];
+    let indicatorMap = {};
 
     function cleanPattern(pattern) {
       if (!pattern) return '';
@@ -116,10 +82,10 @@
       document.getElementById('ui-sub').textContent = t.sub;
       document.getElementById('ui-feed-label').textContent = t.feedLabel;
       document.getElementById('lang-toggle').textContent = t.btnText;
+      document.getElementById('search-input').placeholder = t.searchPlaceholder;
       document.documentElement.lang = currentLang === 'zh' ? 'zh-HK' : 'en';
-      if (cachedBundle) {
-        renderBundle(cachedBundle);
-      }
+      
+      handleSearch();
     }
 
     function toggleLanguage() {
@@ -128,19 +94,37 @@
       applyLocale();
     }
 
-    function renderBundle(data) {
+    function handleSearch() {
+      const query = document.getElementById('search-input').value.toLowerCase().trim();
       const t = I18N[currentLang];
-      const reports = data.objects.filter(o => o.type === 'report');
-      const indicators = Object.fromEntries(
-        data.objects.filter(o => o.type === 'indicator').map(i => [i.id, i.pattern])
-      );
 
+      if (!query) {
+        renderReports(allReports);
+        return;
+      }
+
+      // 即時過濾：比對 標題、描述、以及關聯的 IoC Pattern / Domain
+      const filtered = allReports.filter(r => {
+        const titleMatch = (r.name || '').toLowerCase().includes(query);
+        const descMatch = (r.description || '').toLowerCase().includes(query);
+        const iocMatch = (r.object_refs || []).some(id => {
+          const pat = indicatorMap[id] || '';
+          return pat.toLowerCase().includes(query);
+        });
+        return titleMatch || descMatch || iocMatch;
+      });
+
+      renderReports(filtered, true);
+    }
+
+    function renderReports(reports, isSearching = false) {
+      const t = I18N[currentLang];
       document.getElementById('stat').textContent = `${t.statPrefix} ${reports.length} ${t.statSuffix}`;
       const container = document.getElementById('list');
       container.innerHTML = '';
 
       if (reports.length === 0) {
-        container.innerHTML = `<p>${t.empty}</p>`;
+        container.innerHTML = `<p style="color: #8b949e; text-align: center; padding: 2rem 0;">${isSearching ? t.noMatch : t.empty}</p>`;
         return;
       }
 
@@ -148,7 +132,7 @@
         const card = document.createElement('div');
         card.className = 'card';
 
-        const rawPatterns = (r.object_refs || []).map(id => indicators[id]).filter(Boolean);
+        const rawPatterns = (r.object_refs || []).map(id => indicatorMap[id]).filter(Boolean);
         const displayPatterns = rawPatterns.map(cleanPattern).join(' | ');
         const tooltip = rawPatterns.join('\n');
 
@@ -164,12 +148,17 @@
       });
     }
 
+    // 初次初始化資料
     applyLocale();
     fetch('api/bundle-latest.json')
       .then(res => res.json())
       .then(data => {
         cachedBundle = data;
-        renderBundle(data);
+        allReports = data.objects.filter(o => o.type === 'report');
+        indicatorMap = Object.fromEntries(
+          data.objects.filter(o => o.type === 'indicator').map(i => [i.id, i.pattern])
+        );
+        handleSearch();
       })
       .catch(() => {
         document.getElementById('list').innerHTML = `<p style="color:#f85149;">${I18N[currentLang].errLoad}</p>`;
